@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1a">
+    <title>PTFS Electronic Flight Bag</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            padding: 12px 20px;
+            border-bottom: 2px solid #3a3a3a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .header-info {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs {
+            display: flex;
+            background: #1a1a1a;
+            border-top: 1px solid #3a3a3a;
+            height: 60px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: #1a1a1a;
+            color: #666;
+            border: none;
+            border-top: 3px solid transparent;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .tab-btn:hover {
+            background: #252525;
+            color: #999;
+        }
+
+        .tab-btn.active {
+            background: #252525;
+            color: #00bfff;
+            border-top-color: #00bfff;
+        }
+
+        .tab-icon {
+            font-size: 18px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #00bfff;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #2d2d2d;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            background: #252525;
+            border-color: #3a3a3a;
+            box-shadow: 0 4px 12px rgba(0, 191, 255, 0.1);
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .card-value-highlight {
+            color: #00bfff;
+            font-weight: 600;
+        }
+
+        select, input, textarea {
+            background: #1a1a1a;
+            color: #e0e0e0;
+            border: 1px solid #2d2d2d;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: inherit;
+            width: 100%;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #00bfff;
+            box-shadow: 0 0 8px rgba(0, 191, 255, 0.3);
+        }
+
+        select:hover, input:hover {
+            border-color: #3a3a3a;
+        }
+
+        button {
+            background: #00bfff;
+            color: #000;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background: #00d4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 191, 255, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            border: 1px solid #2d2d2d;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .map-controls button {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .map-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(0deg, transparent 24%, rgba(0, 191, 255, 0.05) 25%, rgba(0, 191, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 191, 255, 0.05) 75%, rgba(0, 191, 255, 0.05) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(0, 191, 255, 0.05) 25%, rgba(0, 191, 255, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 191, 255, 0.05) 75%, rgba(0, 191, 255, 0.05) 76%, transparent 77%, transparent);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        .map-element {
+            position: absolute;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .map-waypoint {
+            width: 10px;
+            height: 10px;
+            background: #00bfff;
+            border: 2px solid #0a0a0a;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .map-waypoint:hover {
+            width: 14px;
+            height: 14px;
+            background: #00d4ff;
+            box-shadow: 0 0 12px rgba(0, 191, 255, 0.6);
+        }
+
+        .map-airport {
+            width: 12px;
+            height: 12px;
+            background: #ff6b6b;
+            border: 2px solid #0a0a0a;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .map-airport:hover {
+            width: 16px;
+            height: 16px;
+            background: #ff8080;
+            box-shadow: 0 0 12px rgba(255, 107, 107, 0.6);
+        }
+
+        .map-aircraft {
+            width: 16px;
+            height: 16px;
+            background: #4ade80;
+            border: 2px solid #0a0a0a;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+        }
+
+        .map-label {
+            background: rgba(10, 10, 10, 0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #00bfff;
+            white-space: nowrap;
+            pointer-events: none;
+            border: 1px solid #2d2d2d;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .chart-thumbnail {
+            background: #1a1a1a;
+            border: 2px solid #2d2d2d;
+            border-radius: 8px;
+            aspect-ratio: 3/4;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chart-thumbnail:hover {
+            border-color: #00bfff;
+            box-shadow: 0 0 16px rgba(0, 191, 255, 0.3);
+            transform: translateY(-4px);
+        }
+
+        .chart-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            width: 90%;
+            height: 90%;
+            background: #1a1a1a;
+            border: 2px solid #00bfff;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .modal-header {
+            background: #2d2d2d;
+            padding: 12px 16px;
+            border-bottom: 1px solid #3a3a3a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-close {
+            background: none;
+            color: #00bfff;
+            font-size: 24px;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #0a0a0a;
+        }
+
+        .spinner {
+            border: 2px solid #2d2d2d;
+            border-top-color: #00bfff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .scroll-container {
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 3px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #2d2d2d;
+            border-radius: 3px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #3a3a3a;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+
+        .status-inactive {
+            background: rgba(100, 100, 100, 0.2);
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 16px;
+            }
+
+            .section-title {
+                font-size: 12px;
+            }
+
+            .card {
+                padding: 12px;
+            }
+
+            .chart-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 10px;
+            }
+        }
+
+        #flightPlanForm {
+            background: #1a1a1a;
+            padding: 16px;
+            border: 1px solid #2d2d2d;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        #flightPlanForm label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #00bfff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .grid-2 input {
+            margin-bottom: 12px;
+        }
+
+        .waypoint-list {
+            background: #1a1a1a;
+            border: 1px solid #2d2d2d;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .waypoint-item {
+            background: #252525;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .waypoint-item:hover {
+            background: #2d2d2d;
+            border-left: 3px solid #00bfff;
+            padding-left: 5px;
+        }
+
+        .waypoint-name {
+            font-weight: 600;
+            color: #00bfff;
+        }
+
+        .waypoint-coords {
+            color: #666;
+            font-size: 10px;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: #666;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="header">
+            <h1>✈ PTFS EFB</h1>
+            <div class="header-info">
+                <div id="headerTime">00:00 UTC</div>
+                <div id="headerStatus">Ready</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="homeTab" class="tab-content active scroll-container">
+                <div class="section">
+                    <div class="section-title">System Status</div>
+                    <div class="card">
+                        <div class="card-title">Aircraft</div>
+                        <div class="card-value">Select an aircraft to begin</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Flight Status</div>
+                        <div class="card-value"><span class="status-badge status-inactive">Not Loaded</span></div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Quick Navigation</div>
+                    <div class="grid-2">
+                        <button onclick="switchTab('aircraft')">Aircraft</button>
+                        <button onclick="switchTab('flight')">Flight Plan</button>
+                        <button onclick="switchTab('charts')">Charts</button>
+                        <button onclick="switchTab('map')">Navigation Map</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Recent Data</div>
+                    <div id="recentDataContainer" class="empty-state">
+                        <div class="empty-state-icon">📊</div>
+                        <div>No recent data</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="aircraftTab" class="tab-content scroll-container">
+                <div class="section">
+                    <div class="section-title">Aircraft Selection</div>
+                    <label for="aircraftSelect" style="display: block; margin-bottom: 8px; font-size: 12px; color: #00bfff;">Select Aircraft:</label>
+                    <select id="aircraftSelect" onchange="selectAircraft()">
+                        <option value="">Loading aircraft...</option>
+                    </select>
+                </div>
+
+                <div id="aircraftDetailsContainer"></div>
+
+                <div class="section">
+                    <div class="section-title">Available Aircraft</div>
+                    <div id="aircraftListContainer"></div>
+                </div>
+            </div>
+
+            <div id="flightTab" class="tab-content scroll-container">
+                <div class="section">
+                    <div class="section-title">Flight Plan</div>
+                    <form id="flightPlanForm" onsubmit="savFlightPlan(event)">
+                        <div class="grid-2">
+                            <div>
+                                <label for="originAirport">Origin</label>
+                                <input type="text" id="originAirport" placeholder="e.g., KSFO" required>
+                            </div>
+                            <div>
+                                <label for="destAirport">Destination</label>
+                                <input type="text" id="destAirport" placeholder="e.g., KJFK" required>
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div>
+                                <label for="cruiseAlt">Cruise Altitude (ft)</label>
+                                <input type="number" id="cruiseAlt" placeholder="35000" min="0" max="50000">
+                            </div>
+                            <div>
+                                <label for="estTime">Est. Time (minutes)</label>
+                                <input type="number" id="estTime" placeholder="240" min="0">
+                            </div>
+                        </div>
+
+                        <label for="waypointsInput">Route Waypoints</label>
+                        <textarea id="waypointsInput" placeholder="Enter waypoints separated by commas (e.g., NOPAC, GAMIC, NYMPH)" rows="3"></textarea>
+
+                        <div class="button-group">
+                            <button type="submit">Save Flight Plan</button>
+                            <button type="button" onclick="exportFlightPlan()">Export</button>
+                            <button type="button" onclick="importFlightPlan()">Import</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Route Waypoints</div>
+                    <div id="waypointsList" class="waypoint-list"></div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Flight Summary</div>
+                    <div id="flightSummary" class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <div>No flight plan loaded</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chartsTab" class="tab-content scroll-container">
+                <div class="section">
+                    <div class="section-title">Airport Charts</div>
+                    <label for="chartSearch" style="display: block; margin-bottom: 8px; font-size: 12px; color: #00bfff;">Search Airport Code:</label>
+                    <input type="text" id="chartSearch" placeholder="Enter airport code (e.g., KSFO)" onchange="searchCharts()">
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Available Charts</div>
+                    <div id="chartGrid" class="chart-grid"></div>
+                </div>
+            </div>
+
+            <div id="mapTab" class="tab-content">
+                <div id="map">
+                    <div class="map-grid"></div>
+                    <div class="map-controls">
+                        <button onclick="zoomIn()">➕</button>
+                        <button onclick="zoomOut()">➖</button>
+                        <button onclick="resetMap()">🏠</button>
+                    </div>
+                    <svg id="mapSvg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></svg>
+                    <canvas id="mapCanvas" style="position: absolute; top: 0; left: 0; display: none;"></canvas>
+                </div>
+            </div>
+
+            <div id="settingsTab" class="tab-content scroll-container">
+                <div class="section">
+                    <div class="section-title">Settings</div>
+                    <div class="card">
+                        <div class="card-title">Data Cache</div>
+                        <button onclick="clearCache()" style="width: 100%; margin-top: 8px;">Clear Cache</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">System Information</div>
+                    <div class="card">
+                        <div class="grid-2">
+                            <div>
+                                <div class="card-value">Version</div>
+                                <div class="card-value-highlight">1.0.0</div>
+                            </div>
+                            <div>
+                                <div class="card-value">Build</div>
+                                <div class="card-value-highlight" id="buildNumber">DEV</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Data Sources</div>
+                    <div class="card">
+                        <div class="card-title">PTFS Official</div>
+                        <div class="card-value" style="word-break: break-all;">ptfs.app/charts</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">GitHub Charts</div>
+                        <div class="card-value" style="word-break: break-all;">github.com/Treelon/ptfs-charts</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Waypoint Reference</div>
+                        <div class="card-value" style="word-break: break-all;">ptfs.fandom.com/wiki/Map</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('home')">
+                <span class="tab-icon">🏠</span>
+                <span>Home</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('aircraft')">
+                <span class="tab-icon">✈</span>
+                <span>Aircraft</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('flight')">
+                <span class="tab-icon">📋</span>
+                <span>Flight</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('charts')">
+                <span class="tab-icon">📊</span>
+                <span>Charts</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('map')">
+                <span class="tab-icon">🗺</span>
+                <span>Map</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('settings')">
+                <span class="tab-icon">⚙</span>
+                <span>Settings</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="chartModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div id="modalTitle">Chart</div>
+                <button class="modal-close" onclick="closeChartModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <img id="chartImage" class="modal-image" alt="Chart">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const APP_VERSION = '1.0.0';
+        const CACHE_VERSION = 'ptfs-efb-v1';
+        
+        let mapZoom = 1;
+        let mapPanX = 0;
+        let mapPanY = 0;
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+
+        let currentAircraft = null;
+        let currentFlightPlan = null;
+        let allWaypoints = [];
+        let allAirports = [];
+
+        const mockAircraft = [
+            { id: 1, name: 'Boeing 737-800', manufacturer: 'Boeing', callsign: 'DAL', category: 'Airliner', maxAlt: 41000, maxRange: 3000, cruiseSpeed: 450 },
+            { id: 2, name: 'Airbus A380', manufacturer: 'Airbus', callsign: 'UAE', category: 'Airliner', maxAlt: 43000, maxRange: 8000, cruiseSpeed: 480 },
+            { id: 3, name: 'Cessna 172', manufacturer: 'Cessna', callsign: 'N1234', category: 'GA', maxAlt: 14000, maxRange: 800, cruiseSpeed: 120 },
+            { id: 4, name: 'Airbus A320', manufacturer: 'Airbus', callsign: 'AAL', category: 'Airliner', maxAlt: 43000, maxRange: 6000, cruiseSpeed: 450 },
+            { id: 5, name: 'Boeing 787', manufacturer: 'Boeing', callsign: 'UAL', category: 'Airliner', maxAlt: 43000, maxRange: 7700, cruiseSpeed: 490 }
+        ];
+
+        const mockWaypoints = [
+            { name: 'NOPAC', lat: 51.5, lon: -15.5 },
+            { name: 'GAMIC', lat: 52.0, lon: -20.0 },
+            { name: 'NYMPH', lat: 52.5, lon: -25.5 },
+            { name: 'RADAR', lat: 53.0, lon: -30.0 },
+            { name: 'SEPAT', lat: 53.5, lon: -35.0 }
+        ];
+
+        const mockAirports = [
+            { code: 'KSFO', name: 'San Francisco International', lat: 37.6213, lon: -122.379 },
+            { code: 'KJFK', name: 'John F. Kennedy International', lat: 40.6413, lon: -73.7781 },
+            { code: 'KLAX', name: 'Los Angeles International', lat: 33.9425, lon: -118.4081 },
+            { code: 'KORD', name: 'Chicago O Hare', lat: 41.8742, lon: -87.9073 },
+            { code: 'EGLL', name: 'London Heathrow', lat: 51.4700, lon: -0.4543 }
+        ];
+
+        function initApp() {
+            loadAircraftData();
+            loadWaypointData();
+            loadAirportData();
+            initMapCanvas();
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const utcHours = String(now.getUTCHours()).padStart(2, '0');
+            const utcMinutes = String(now.getUTCMinutes()).padStart(2, '0');
+            document.getElementById('headerTime').textContent = `${utcHours}:${utcMinutes} UTC`;
+        }
+
+        async function loadAircraftData() {
+            try {
+                const cached = localStorage.getItem('aircraft_data');
+                if (cached) {
+                    displayAircraftList(JSON.parse(cached));
+                    return;
+                }
+            } catch (e) {}
+
+            displayAircraftList(mockAircraft);
+            localStorage.setItem('aircraft_data', JSON.stringify(mockAircraft));
+        }
+
+        function displayAircraftList(aircraft) {
+            const select = document.getElementById('aircraftSelect');
+            const container = document.getElementById('aircraftListContainer');
+            
+            select.innerHTML = '<option value="">Select an aircraft...</option>';
+            container.innerHTML = '';
+
+            aircraft.forEach(plane => {
+                const option = document.createElement('option');
+                option.value = plane.id;
+                option.textContent = `${plane.name} (${plane.callsign})`;
+                select.appendChild(option);
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.onclick = () => {
+                    document.getElementById('aircraftSelect').value = plane.id;
+                    selectAircraft();
+                };
+                card.innerHTML = `
+                    <div class="card-title">${plane.name}</div>
+                    <div class="grid-2" style="margin-top: 8px; font-size: 11px;">
+                        <div><span style="color: #666;">Manufacturer:</span><br><span class="card-value-highlight">${plane.manufacturer}</span></div>
+                        <div><span style="color: #666;">Callsign:</span><br><span class="card-value-highlight">${plane.callsign}</span></div>
+                        <div><span style="color: #666;">Max Alt:</span><br><span class="card-value-highlight">${plane.maxAlt}ft</span></div>
+                        <div><span style="color: #666;">Cruise Speed:</span><br><span class="card-value-highlight">${plane.cruiseSpeed}kt</span></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function selectAircraft() {
+            const id = parseInt(document.getElementById('aircraftSelect').value);
+            currentAircraft = mockAircraft.find(a => a.id === id);
+            
+            if (currentAircraft) {
+                displayAircraftDetails();
+                loadFlightPlanForAircraft();
+            }
+        }
+
+        function displayAircraftDetails() {
+            const container = document.getElementById('aircraftDetailsContainer');
+            if (!currentAircraft) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="section">
+                    <div class="section-title">Current Aircraft</div>
+                    <div class="card">
+                        <div class="card-title">${currentAircraft.name}</div>
+                        <div style="font-size: 12px; margin-top: 12px;">
+                            <div style="margin-bottom: 8px;"><span style="color: #666;">Callsign:</span> <span class="card-value-highlight">${currentAircraft.callsign}</span></div>
+                            <div style="margin-bottom: 8px;"><span style="color: #666;">Category:</span> <span class="card-value-highlight">${currentAircraft.category}</span></div>
+                            <div style="margin-bottom: 8px;"><span style="color: #666;">Max Altitude:</span> <span class="card-value-highlight">${currentAircraft.maxAlt} ft</span></div>
+                            <div style="margin-bottom: 8px;"><span style="color: #666;">Max Range:</span> <span class="card-value-highlight">${currentAircraft.maxRange} nm</span></div>
+                            <div><span style="color: #666;">Cruise Speed:</span> <span class="card-value-highlight">${currentAircraft.cruiseSpeed} kt</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadWaypointData() {
+            try {
+                const cached = localStorage.getItem('waypoint_data');
+                if (cached) {
+                    allWaypoints = JSON.parse(cached);
+                    return;
+                }
+            } catch (e) {}
+
+            allWaypoints = mockWaypoints;
+            localStorage.setItem('waypoint_data', JSON.stringify(mockWaypoints));
+        }
+
+        async function loadAirportData() {
+            try {
+                const cached = localStorage.getItem('airport_data');
+                if (cached) {
+                    allAirports = JSON.parse(cached);
+                    return;
+                }
+            } catch (e) {}
+
+            allAirports = mockAirports;
+            localStorage.setItem('airport_data', JSON.stringify(mockAirports));
+        }
+
+        function loadFlightPlanForAircraft() {
+            if (!currentAircraft) return;
+
+            const stored = localStorage.getItem(`flightplan_${currentAircraft.id}`);
+            if (stored) {
+                currentFlightPlan = JSON.parse(stored);
+                populateFlightPlanForm();
+                displayFlightSummary();
+            }
+        }
+
+        function savFlightPlan(event) {
+            event.preventDefault();
+
+            if (!currentAircraft) {
+                alert('Please select an aircraft first');
+                return;
+            }
+
+            const plan = {
+                origin: document.getElementById('originAirport').value,
+                destination: document.getElementById('destAirport').value,
+                cruiseAlt: parseInt(document.getElementById('cruiseAlt').value) || 0,
+                estTime: parseInt(document.getElementById('estTime').value) || 0,
+                waypoints: document.getElementById('waypointsInput').value.split(',').map(w => w.trim()).filter(w => w)
+            };
+
+            currentFlightPlan = plan;
+            localStorage.setItem(`flightplan_${currentAircraft.id}`, JSON.stringify(plan));
+            
+            displayFlightSummary();
+            updateWaypointsList();
+            
+            alert('Flight plan saved');
+        }
+
+        function populateFlightPlanForm() {
+            if (!currentFlightPlan) return;
+
+            document.getElementById('originAirport').value = currentFlightPlan.origin;
+            document.getElementById('destAirport').value = currentFlightPlan.destination;
+            document.getElementById('cruiseAlt').value = currentFlightPlan.cruiseAlt;
+            document.getElementById('estTime').value = currentFlightPlan.estTime;
+            document.getElementById('waypointsInput').value = currentFlightPlan.waypoints.join(', ');
+
+            updateWaypointsList();
+        }
+
+        function updateWaypointsList() {
+            const container = document.getElementById('waypointsList');
+            if (!currentFlightPlan || !currentFlightPlan.waypoints.length) {
+                container.innerHTML = '<div style="color: #666; padding: 20px; text-align: center;">No waypoints in flight plan</div>';
+                return;
+            }
+
+            container.innerHTML = currentFlightPlan.waypoints.map((wp, idx) => {
+                const waypointData = allWaypoints.find(w => w.name === wp);
+                const coords = waypointData ? `${waypointData.lat.toFixed(2)}°, ${waypointData.lon.toFixed(2)}°` : 'Unknown';
+                
+                return `
+                    <div class="waypoint-item">
+                        <div>
+                            <div class="waypoint-name">${wp}</div>
+                            <div class="waypoint-coords">${coords}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function displayFlightSummary() {
+            const container = document.getElementById('flightSummary');
+            
+            if (!currentFlightPlan) {
+                container.innerHTML = '<div style="color: #666; padding: 20px; text-align: center;">No flight plan loaded</div>';
+                return;
+            }
+
+            const originAirport = allAirports.find(a => a.code === currentFlightPlan.origin);
+            const destAirport = allAirports.find(a => a.code === currentFlightPlan.destination);
+
+            container.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="card" style="margin: 0;">
+                        <div class="grid-2">
+                            <div>
+                                <div class="card-value">Origin</div>
+                                <div class="card-value-highlight">${currentFlightPlan.origin}</div>
+                                <div class="card-value" style="font-size: 10px; margin-top: 4px;">${originAirport ? originAirport.name : 'Unknown'}</div>
+                            </div>
+                            <div>
+                                <div class="card-value">Destination</div>
+                                <div class="card-value-highlight">${currentFlightPlan.destination}</div>
+                                <div class="card-value" style="font-size: 10px; margin-top: 4px;">${destAirport ? destAirport.name : 'Unknown'}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" style="margin: 0;">
+                        <div class="grid-2">
+                            <div>
+                                <div class="card-value">Cruise Altitude</div>
+                                <div class="card-value-highlight">${currentFlightPlan.cruiseAlt} ft</div>
+                            </div>
+                            <div>
+                                <div class="card-value">Est. Duration</div>
+                                <div class="card-value-highlight">${currentFlightPlan.estTime} min</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function exportFlightPlan() {
+            if (!currentFlightPlan) {
+                alert('No flight plan to export');
+                return;
+            }
+
+            const data = JSON.stringify(currentFlightPlan, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `flightplan-${currentAircraft.callsign}-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importFlightPlan() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        currentFlightPlan = JSON.parse(event.target.result);
+                        populateFlightPlanForm();
+                        displayFlightSummary();
+                        alert('Flight plan imported');
+                    } catch (err) {
+                        alert('Invalid flight plan file');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function searchCharts() {
+            const code = document.getElementById('chartSearch').value.toUpperCase();
+            const grid = document.getElementById('chartGrid');
+            
+            if (!code) {
+                grid.innerHTML = '';
+                return;
+            }
+
+            grid.innerHTML = `
+                <div class="chart-thumbnail" onclick="loadChart('${code}')">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; margin-bottom: 8px;">📊</div>
+                        <div>${code}</div>
+                        <div style="font-size: 10px; color: #666; margin-top: 4px;">Approach Chart</div>
+                    </div>
+                </div>
+                <div class="chart-thumbnail" onclick="loadChart('${code}-GROUND')">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; margin-bottom: 8px;">🗺</div>
+                        <div>${code}</div>
+                        <div style="font-size: 10px; color: #666; margin-top: 4px;">Ground Layout</div>
+                    </div>
+                </div>
+                <div class="chart-thumbnail" onclick="loadChart('${code}-FREQ')">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; margin-bottom: 8px;">📡</div>
+                        <div>${code}</div>
+                        <div style="font-size: 10px; color: #666; margin-top: 4px;">Frequencies</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadChart(chartId) {
+            const modal = document.getElementById('chartModal');
+            document.getElementById('modalTitle').textContent = `Chart: ${chartId}`;
+            
+            const img = document.getElementById('chartImage');
+            img.src = `data:image/svg+xml,${encodeURIComponent(`
+                <svg width="800" height="1000" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="800" height="1000" fill="%231a1a1a" stroke="%2300bfff" stroke-width="2"/>
+                    <text x="400" y="100" font-size="32" fill="%2300bfff" text-anchor="middle" font-weight="bold">${chartId}</text>
+                    <text x="400" y="150" font-size="16" fill="%23999" text-anchor="middle">Airport Chart</text>
+                    <circle cx="400" cy="500" r="100" fill="none" stroke="%2300bfff" stroke-width="2" stroke-dasharray="5,5"/>
+                    <line x1="100" y1="300" x2="700" y2="300" stroke="%2300bfff" stroke-width="1" stroke-dasharray="3,3"/>
+                    <line x1="100" y1="700" x2="700" y2="700" stroke="%2300bfff" stroke-width="1" stroke-dasharray="3,3"/>
+                    <text x="400" y="950" font-size="12" fill="%23666" text-anchor="middle">Elevation data and frequencies available at PTFS resources</text>
+                </svg>
+            `)}`;
+            
+            modal.classList.add('active');
+        }
+
+        function closeChartModal() {
+            document.getElementById('chartModal').classList.remove('active');
+        }
+
+        function initMapCanvas() {
+            const mapContainer = document.getElementById('map');
+            const svg = document.getElementById('mapSvg');
+            
+            mapContainer.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                if (e.deltaY < 0) zoomIn();
+                else zoomOut();
+            });
+
+            mapContainer.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+            });
+
+            mapContainer.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaX = e.clientX - dragStartX;
+                    const deltaY = e.clientY - dragStartY;
+                    mapPanX += deltaX;
+                    mapPanY += deltaY;
+                    dragStartX = e.clientX;
+                    dragStartY = e.clientY;
+                    renderMap();
+                }
+            });
+
+            mapContainer.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            mapContainer.addEventListener('mouseleave', () => {
+                isDragging = false;
+            });
+
+            renderMap();
+        }
+
+        function renderMap() {
+            const svg = document.getElementById('mapSvg');
+            const container = document.getElementById('map');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            svg.innerHTML = '';
+            svg.setAttribute('viewBox', `${-mapPanX / mapZoom} ${-mapPanY / mapZoom} ${width / mapZoom} ${height / mapZoom}`);
+
+            const scale = 50;
+
+            allAirports.forEach(airport => {
+                const x = airport.lon * scale + mapPanX;
+                const y = airport.lat * scale + mapPanY;
+
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', x);
+                circle.setAttribute('cy', y);
+                circle.setAttribute('r', 8 / mapZoom);
+                circle.setAttribute('fill', '#ff6b6b');
+                circle.setAttribute('stroke', '#0a0a0a');
+                circle.setAttribute('stroke-width', 2 / mapZoom);
+                circle.style.cursor = 'pointer';
+                circle.onclick = () => alert(`Airport: ${airport.code}\n${airport.name}`);
+                svg.appendChild(circle);
+
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', x + 12 / mapZoom);
+                text.setAttribute('y', y - 12 / mapZoom);
+                text.setAttribute('fill', '#00bfff');
+                text.setAttribute('font-size', 12 / mapZoom);
+                text.setAttribute('font-weight', 'bold');
+                text.textContent = airport.code;
+                text.style.pointerEvents = 'none';
+                svg.appendChild(text);
+            });
+
+            allWaypoints.forEach(waypoint => {
+                const x = waypoint.lon * scale + mapPanX;
+                const y = waypoint.lat * scale + mapPanY;
+
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', x);
+                circle.setAttribute('cy', y);
+                circle.setAttribute('r', 6 / mapZoom);
+                circle.setAttribute('fill', '#00bfff');
+                circle.setAttribute('stroke', '#0a0a0a');
+                circle.setAttribute('stroke-width', 2 / mapZoom);
+                circle.style.cursor = 'pointer';
+                circle.onclick = () => alert(`Waypoint: ${waypoint.name}\nLat: ${waypoint.lat.toFixed(4)}\nLon: ${waypoint.lon.toFixed(4)}`);
+                svg.appendChild(circle);
+
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', x + 10 / mapZoom);
+                text.setAttribute('y', y - 10 / mapZoom);
+                text.setAttribute('fill', '#00bfff');
+                text.setAttribute('font-size', 11 / mapZoom);
+                text.setAttribute('font-weight', 'bold');
+                text.textContent = waypoint.name;
+                text.style.pointerEvents = 'none';
+                svg.appendChild(text);
+            });
+
+            const aircraftX = -100 * scale + mapPanX;
+            const aircraftY = 40 * scale + mapPanY;
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', aircraftX);
+            circle.setAttribute('cy', aircraftY);
+            circle.setAttribute('r', 8 / mapZoom);
+            circle.setAttribute('fill', '#4ade80');
+            circle.setAttribute('stroke', '#0a0a0a');
+            circle.setAttribute('stroke-width', 2 / mapZoom);
+            circle.setAttribute('filter', `drop-shadow(0 0 ${8 / mapZoom}px rgba(74, 222, 128, 0.6))`);
+            svg.appendChild(circle);
+
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', aircraftX + 12 / mapZoom);
+            text.setAttribute('y', aircraftY - 12 / mapZoom);
+            text.setAttribute('fill', '#4ade80');
+            text.setAttribute('font-size', 11 / mapZoom);
+            text.setAttribute('font-weight', 'bold');
+            text.textContent = currentAircraft ? currentAircraft.callsign : 'AC';
+            text.style.pointerEvents = 'none';
+            svg.appendChild(text);
+        }
+
+        function zoomIn() {
+            mapZoom = Math.min(mapZoom * 1.2, 5);
+            renderMap();
+        }
+
+        function zoomOut() {
+            mapZoom = Math.max(mapZoom / 1.2, 0.5);
+            renderMap();
+        }
+
+        function resetMap() {
+            mapZoom = 1;
+            mapPanX = 0;
+            mapPanY = 0;
+            renderMap();
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            const tabId = tabName === 'aircraft' ? 'aircraftTab' : 
+                         tabName === 'flight' ? 'flightTab' :
+                         tabName === 'charts' ? 'chartsTab' :
+                         tabName === 'map' ? 'mapTab' :
+                         tabName === 'settings' ? 'settingsTab' : 'homeTab';
+
+            document.getElementById(tabId).classList.add('active');
+            event.target.closest('.tab-btn').classList.add('active');
+
+            if (tabName === 'map') {
+                setTimeout(() => renderMap(), 100);
+            }
+        }
+
+        function clearCache() {
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('ptfs-') || key.startsWith('aircraft_') || key.startsWith('waypoint_') || key.startsWith('airport_') || key.startsWith('flightplan_')) {
+                    localStorage.removeItem(key);
+                }
+            });
+            alert('Cache cleared');
+            location.reload();
+        }
+
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+</html>
